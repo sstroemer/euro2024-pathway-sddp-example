@@ -13,7 +13,7 @@ function parse_config!(model, filename; time, can_invest)
         base = Dict(:name => string(asset), :T => time, :can_invest => can_invest)
 
         f = getfield(@__MODULE__, Symbol("add_$(pop!(properties, :type))!"))
-        f(model, nothing, merge(base, properties))
+        f(model,  merge(base, properties))
     end
 
     return nothing
