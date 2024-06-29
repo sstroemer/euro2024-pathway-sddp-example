@@ -69,7 +69,9 @@ function _create_demand()
     df_demand[!, "demand1"] = df_demand[!, "Leistung [MW]"] .* scale
 
     df_demand[!, "time"] = [(y, i) for y in [2030, 2040, 2050] for i in 1:8736]
-    return CSV.write("data/demand.csv", df_demand)
+    CSV.write("data/demand.csv", df_demand)
+
+    return nothing
 end
 
 function _create_res()
@@ -91,10 +93,14 @@ function _create_res()
     df_res = vcat(dfs...)
 
     df_res[!, "time"] = [(y, i) for y in [2030, 2040, 2050] for i in 1:8736]
-    return CSV.write("data/res.csv", df_res)
+    CSV.write("data/res.csv", df_res)
+
+    return nothing
 end
 
 function create_input_data()
     _create_demand()
-    return _create_res()
+    _create_res()
+
+    return nothing
 end
