@@ -3,6 +3,8 @@
 # Storage is based on the September 2023 update
 #
 # Rate of 6% applied to annuity calculations
+#
+# annuity(capex, lifetime, rate) = capex * rate / (1 - (1 + rate) ^ (-lifetime))
 
 # Gas Engine (based on "natural gas"):
 #   > 957_000 EUR/MW + 9_890 EUR/MW/a
