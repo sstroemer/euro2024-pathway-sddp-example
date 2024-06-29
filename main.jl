@@ -31,6 +31,10 @@
 
 include("src/util.jl")
 include("src/data.jl")
+
+# Uncomment this to re-create the input data.
+# create_input_data()
+
 include("opt/opt.jl")
 
 include("src/pathway.jl")

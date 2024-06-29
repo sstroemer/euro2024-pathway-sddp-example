@@ -23,9 +23,6 @@ include("res.jl")
 include("thermal.jl")
 include("storage.jl")
 
-# Uncomment this to re-create the input data.
-# create_input_data()
-
 function build_stage_model!(model, time)
     model.ext[:opt_container] = OptContainer(Dict(), Dict(), Dict(), Dict(), Dict())
 
