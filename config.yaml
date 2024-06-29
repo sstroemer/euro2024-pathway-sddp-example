@@ -1,0 +1,114 @@
+# Tech. data source: ens.dk, catalogue update April 2024
+# Where applicable, average values from 2030 are taken
+# Storage is based on the September 2023 update
+#
+# Rate of 6% applied to annuity calculations
+
+# Gas Engine (based on "natural gas"):
+#   > 957_000 EUR/MW + 9_890 EUR/MW/a
+#   > 25 years lifetime
+#   > 47% efficiency
+#   > 5.42 EUR/MWh
+#
+#   ~ annuity: 74_862.97 EUR/MW + 9_890 EUR/MW/a = "84752.97 EUR/MW"
+
+# Wind Onshore:
+#   > 1_150_000 EUR/MW + 16_663 EUR/MW/a
+#   > 30 years lifetime
+#   > 1.98 EUR/MWh
+#
+#   ~ annuity: 83546.25 EUR/MW + 16_663 EUR/MW/a = "100209.25 EUR/MW"
+
+# Utility-scale PV:
+#   > 380_000 EUR/MW + 9_500 EUR/MW/a
+#   > 40 years lifetime
+#
+#   ~ annuity: 25255.38 EUR/MW + 9_500 EUR/MW/a = "34755.38 EUR/MW"
+
+# Lithium-ion battery (2030):
+#   > 65_900 EUR/MWh + 17_0100 EUR/MW + 85_070 EUR/MWh ("other, 1:3 to E:P")
+#     --> 87_168 EUR/MWh + 233_903 EUR/MW
+#   > 0.00057 EUR/MW FOM; neglected
+#   > 1.91 EUR/MWh VOM; neglected
+#   > 25 years lifetime (30_000 cycles)
+#
+#   ~ annuity: 6818.87 EUR/MWh + 18297.46 EUR/MW
+
+# Lithium-ion battery (2050):
+#   > 37_200 EUR/MWh + 63_800 EUR/MW + 42_500 EUR/MWh ("other, 1:3 to E:P")
+#     --> 47_825 EUR/MWh + 95_675 EUR/MW
+#   > 0.00057 EUR/MW FOM; neglected
+#   > 1.70 EUR/MWh VOM; neglected
+#   > 30 years lifetime (50_000 cycles)
+#
+#   ~ annuity: 3474.43 EUR/MWh + 6950.68 EUR/MW
+#     --> scale by: 0.38 and 0.51 from 2030 to 2050
+#     --> this is approximatively accounted internally, to simplify the model
+
+# Hydro RoR:
+#   > 3_400_000 EUR/MW + 68_000 EUR/MW/a
+#   > 80 years lifetime
+#
+#   ~ annuity: 205946.64 EUR/MW + 68_000 EUR/MW/a = "273946.64 EUR/MW"
+
+assets:
+  node1:
+    type: node
+  
+  demand1:
+    type: demand
+    node: node1
+    value: demand1
+
+  Wind:
+    type: res
+    node: node1
+    availability: "Wind [MW]"
+    p_nom_max: 10000.0
+    annuity: 100209.25
+    vom: 1.98
+  
+  PV:
+    type: res
+    node: node1
+    availability: "Solar [MW]"
+    p_nom_max: 15000.0
+    annuity: 34755.38
+    vom: 0.0
+
+  Hydro:
+    type: res
+    node: node1
+    availability: "Lauf- und Schwellwasser [MW]"
+    p_nom_max: 10000.0
+    annuity: 273946.64
+    vom: 0.0
+
+  Gas Turbine (H2):
+    type: thermal
+    node: node1
+    fuel: hydrogen
+    vom: 5.42
+    annuity: 84752.97
+    efficiency: 0.47
+    emission_factor: 0.0
+    p_nom_max: 10000.0
+
+  Gas Turbine (CH4):
+    type: thermal
+    node: node1
+    fuel: methane
+    vom: 5.42
+    annuity: 84752.97             
+    efficiency: 0.47
+    emission_factor: 0.429  # source: https://www.rte-france.com/en/eco2mix/co2-emissions
+    p_nom_max: 10000.0
+
+  Storage:
+    type: storage
+    node: node1
+    annuity_power: 18297.46
+    annuity_energy: 6818.87
+    roundtrip_efficiency: 0.92
+    p_nom_max: 4000.0
+    e_nom_max: 20000.0
