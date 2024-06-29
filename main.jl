@@ -37,7 +37,6 @@ using OrderedCollections
 using Statistics
 using PlotlyJS
 
-
 include("src/util.jl")
 include("src/data.jl")
 
@@ -46,6 +45,10 @@ include("src/data.jl")
 
 include("opt/opt.jl")
 
+TRAIN_MAX_ITER = 50
+SIMULATE_ITER = 1
 include("src/pathway.jl")
-include("src/singleshot.jl")
 
+TRAIN_MAX_ITER = 50
+SIMULATE_ITER = 1
+include("src/singleshot.jl")

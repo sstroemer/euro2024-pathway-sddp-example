@@ -24,12 +24,15 @@ for i in 1:3
 end
 
 ss_df_p_nom = DataFrame(hcat(collect.(values.(ss_res_p_nom))...)', first.(all_p_nom))
-ss_df_p_nom[!, "time"] = [2030, 2040, 2050]
+ss_df_p_nom[!, "time"] = ["$it (SS)" for it in [2030, 2040, 2050]]
 ss_df_p_nom = stack(ss_df_p_nom, Not(:time); variable_name=:asset, value_name=:value)
-plot(ss_df_p_nom; kind="bar", x=:time, y=:value, color=:asset, Layout(; title="Installed Capacity", barmode="relative"))
 
 ss_df_gen = DataFrame(hcat(ss_res_gen...)', first.(all_gen))
 ss_df_gen[!, "Storage (charge)"] .*= -1
 ss_df_gen[!, "time"] = ["$it (SS)" for it in [2030, 2040, 2050]]
 ss_df_gen = stack(ss_df_gen, Not(:time); variable_name=:asset, value_name=:value)
-plot(ss_df_gen; kind="bar", x=:time, y=:value, color=:asset, Layout(; title="Generation", barmode="relative"))
+
+p = plot(ss_df_p_nom; kind="bar", x=:time, y=:value, color=:asset, Layout(; title="Capacity (SS)", barmode="relative"))
+display(p)
+p = plot(ss_df_gen; kind="bar", x=:time, y=:value, color=:asset, Layout(; title="Generation (SS)", barmode="relative"))
+display(p)

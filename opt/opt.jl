@@ -50,7 +50,7 @@ function build_stage_objective!(model; prices::Dict)
             add_to_expression!(total_obj, obj * prices[name])
         end
     end
-    
+
     SDDP.@stageobjective(model, total_obj)
 
     return nothing
@@ -77,4 +77,3 @@ function subproblem_builder(subproblem::Model, node::Int; offset::Int=0)
 
     return subproblem
 end
-
