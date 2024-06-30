@@ -65,9 +65,11 @@ function subproblem_builder(subproblem::Model, node::Int; offset::Int=0)
 
     build_stage_model!(subproblem, time)
 
-    Ω = [(0.5, 0.25, 0.5, 5e4)]
-    P = [1.0]
+    DEFAULT = (0.5, 0.25, 0.5, 0.5)
     Ω_entries = ["hydrogen", "methane", "co2", "shedding"]
+
+    Ω = [DEFAULT]
+    P = [1.0]
 
     SDDP.parameterize(subproblem, Ω, P) do ω
         prices = Dict(n => getfield(Main, Symbol("price_$n"))(year; ω=ω[i]) for (i, n) in enumerate(Ω_entries))

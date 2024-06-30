@@ -37,11 +37,15 @@ function price_methane(y::Int64; ω::Float64=0.5)
     #   > 2050 - 9 USD/mmbtu ~ 28.6 EUR/MWh
 
     # Assuming an uneven scale, from "-25%" to "+75%".
-    scale = 1 + (ω - 0.25)
+    scale = 1.0 + (ω - 0.25)
     return scale * (15.9 + (y - 2030) / 20.0 * (28.6 - 15.9))
 end
 
-price_shedding(y::Int64; ω::Float64=1e5) = ω
+function price_shedding(y::Int64; ω::Float64=0.5)
+    rel_dy = (y - 2030) / 20.0
+    scale = 1.0 + (ω - 0.5)
+    return scale * (3.0e4 * (1.0 - rel_dy * 0.9))
+end
 
 function _create_demand()
     url_demand(y) =
