@@ -1,0 +1,342 @@
+---
+title: Modeling long-term energy transition pathways
+subtitle: Algorithmic approaches and their properties
+date: 02.07.2024
+
+author:
+  - "**Stefan Strömer**$^{1,2}$"
+  - Kenneth Bruninx$^2$
+  - Stefan Pfenninger-Lee$^2$
+
+institute:
+  - "$^1$ AIT Austrian Institute of Technology"
+  - "$^2$ Delft University of Technology"
+
+format:
+  beamer:
+    theme: CambridgeUS
+    colortheme: beaver
+    aspectratio: 169
+    section-titles: false
+    titlegraphic: /home/sstroemer/phd/euro2024/presentation/img/logo
+
+callout-appearance: simple
+---
+
+# Long-term energy system modelling
+
+## Overview
+
+### Overview
+
+#### **Why?**
+
+We (may) know where we want (or need) to be in 25 years: Models, plans, studies, reports, and opinions exist. What is often lost in the discussion are not only concrete first, but all steps along the way, towards reaching a specific goal.
+
+#### **Content**
+
+- Challenges & different model types
+- Overview: Approaches
+    - Simulation models
+    - Reducing model resolution
+    - Myopic paths
+    - Decomposition algorithms
+    - Stochastic Dual Dynamic Programming
+- A simplified example
+
+## Challenges
+
+### Challenges
+
+::: {.callout-warning}
+#### General
+- _"Are assets assets or burdens?"_ (salvage/residual values)
+- _"Is there a world after 2050?"_ (end of horizon effects)
+- Depiction of investments via annuities or lump-sum payments
+- Seasonal storages (or budget constraints)
+- Balancing contradictory levels of detail: long-term vs. hourly
+:::
+
+::: {.callout-caution}
+#### Interpretation, comparing results, and benchmarking
+Keep in mind, that _**optimal**_ does not infer _**unique**_. There may highly diverse optimal solutions, differing structurally, and even more near-optimal ones.
+:::
+
+## Different modelling approaches
+
+### Snapshot models
+
+::: {.callout-note}
+#### Definition
+- operate on consecutive _snapshots_ ("= time steps") of a system
+- for each, all input data can be specified
+- often make use of (multi-) hourly snapshots
+- often span a single, full year
+:::
+
+::: {.callout-tip}
+#### Properties
+- are "easy" to describe mathematically
+- provide insights into the energy system for individual years
+- lack the ability to depict dynamics in investment strategies throughout a transition period
+:::
+
+### Transition (pathway) models
+
+::: {.callout-note}
+#### Definition
+- can be seen as extension to snapshot models
+- represent the entire transition pathway to a long term target
+- trade off short- and long-term goals
+- can apply discounting for (far) future
+:::
+
+::: {.callout-tip}
+#### Properties
+- can be "hard" to describe mathematically
+- provide insights into the energy system over a period of many years
+- quickly become computationally intractable
+- are not fully supported by many tools
+:::
+
+# Algorithms: An Overview
+
+## Simulation
+
+### Agent-based models (ABMs)
+
+Simulation models, especially agent-based ones, can be
+
+- used to simulate large periods of time, while keeping computational complexity (somewhat) under control;
+- used to study investment decisions that profit-seeking investors might choose, in contrast to often-assumed central planning;
+- "easily" linked to other topics, like risk aversion, social acceptance, learning curves, ...
+
+**Soft coupling:** Coupling ABMs with optimization models can not only be done by considering agents that solve optimization problems, but also via (iterative) soft coupling.
+
+::: {.callout-tip}
+Deissenroth, M., et al. (2017) -- [elib.dlr.de/117348/](https://elib.dlr.de/117348/)
+:::
+
+## Conventional optimization
+
+### Reducing model resolution - (I)
+
+#### **Direct reduction of model resolution**
+_Examples:_ Either reduce the temporal resolution from $n$- to $m$-hourly ($m > n$) blocks, or reduce the spatial resolution (e.g., via clustering).
+
+::: {.callout-tip}
+Frysztacki M., et al. (2021) -- [doi: 10.1016/j.apenergy.2021.116726](https://doi.org/10.1016/j.apenergy.2021.116726)
+:::
+
+#### **Variable resolutions**
+_Examples:_ Extend the simple reduction to account for higher details (temporal and spatial) during important periods (e.g., extreme events).
+
+::: {.callout-tip}
+Poncelet, K., et al. (2016) -- [doi: 10.1016/j.apenergy.2015.10.100](https://doi.org/10.1016/j.apenergy.2015.10.100)
+:::
+
+### Reducing model resolution - (II)
+
+#### **Representative periods**
+Instead of modeling each snapshot, a _representative period_ presumes that some periods throughout the year are highly similar to others, and therefore need not be modelled individually. Periods are often _days or weeks_.
+
+::: {.callout-caution}
+#### Interdependencies
+While many approaches target a reduction of interdependencies between distinct periods - myopic paths are a high-level example of that - representative periods initially increase the temporal coupling of a model.
+:::
+
+Without any inter-temporal constraints, models immediately decompose into their representative periods, that can then be recombined (e.g., using weights).
+
+### Reducing model resolution - (III)
+
+#### **Fixing cyclic states**
+For small scale storages, it can be argued that this cyclic behaviour occurs more often, e.g., each week, or even day. Assuming that each cyclic period is constrained to the same initial state of charge (e.g., 50%) immediately leads to decoupled periods.
+
+#### **Foregoing per-snapshot decisions**
+Assuming that demand and generation behave "identical" for time periods that are similar, all decision variables - except those related to _states_ (e.g., storages) - can be dropped and replaced by their representative.
+
+::: {.callout-tip}
+[github.com/spine-tools/SpineOpt.jl](https://github.com/spine-tools/SpineOpt.jl)
+:::
+
+### Reducing model resolution - (IV)
+
+#### **Mixed temporal resolutions**
+With a similar argument, temporal granularity of decision variables can be reduced, e.g., by modeling renewables in hourly resolution, and nuclear plants in congruent 8-hour blocks. _This may not be studied enough to actually gauge whether it's actually an improvement._
+
+#### **Complex inter-period behaviour**
+Many modern frameworks apply a formulation of seasonal storages, that summarizes intra-period states, properly respecting upper/lower storage bounds, while dropping decision variables based on representative periods.
+
+::: {.callout-tip}
+Kotzur, L., et al. (2018) -- [doi: 10.1016/j.apenergy.2018.01.023](https://doi.org/10.1016/j.apenergy.2018.01.023)
+
+Gonzato, S., et al. (2021) -- [doi: 10.1016/j.apenergy.2021.117168](https://doi.org/10.1016/j.apenergy.2021.117168)
+
+Gabrielli, P., et al. (2018) -- [doi: 10.1016/j.apenergy.2017.07.142](https://doi.org/10.1016/j.apenergy.2017.07.142)
+:::
+
+### Myopic Paths
+
+#### **Approach**
+- picks a number of modeling years
+- intializes the model for the first year, and optimizes it
+- uses the results of that run as initialization of the next year's model
+
+::: {.callout-tip}
+Limpens, G., et al. (2024) -- [doi: 10.1016/j.apenergy.2023.122501](https://doi.org/10.1016/j.apenergy.2023.122501)
+
+Victoria, M., et al. (2020) -- [doi: 10.1038/s41467-020-20015-4](https://doi.org/10.1038/s41467-020-20015-4)
+:::
+
+:::: {.columns}
+
+::: {.column width="48%"}
+#### **Advantages**
+
+- allow decommissioning between years
+- are "easy" to configure with input data
+- can overlap years (similar to MPC)
+:::
+
+::: {.column width="48%"}
+#### **Disadvantages**
+
+- prone to lock-in effects
+- assume intra-year perfect foresight
+- "budget" constraints must be provided
+:::
+
+::::
+
+## Decomposition algorithms
+
+### Motivating model decompositions
+
+![Starting from an abstract form of a monolithic model ...](img/1.drawio.png){height=65%}
+
+### Motivating model decompositions
+
+![... separating design and operational decisions ...](img/2.drawio.png){height=65%}
+
+### Motivating model decompositions
+
+![... considering what could happen if we knew about the design beforehand.](img/3.drawio.png){height=65%}
+
+### The "Benders way to think"
+
+![Two separate tasks, two separate optimization problems ...](img/4.drawio.png){height=65%}
+
+### The "Benders way to think"
+
+![... including a way to communicate a chosen design ...](img/5.drawio.png){height=65%}
+
+### The "Benders way to think"
+
+![... including a "feedback" loop to improve our decisions.](img/6.drawio.png){height=65%}
+
+<!--
+### ADMM as one of many alternatives 
+
+![Consensus ADMM (Alternating Direction Method of Multipliers) replaces the previous "central controller" scheme by distributed "actors" with equal rights.](img/7.drawio.png){height=65%}
+-->
+
+## (Stochastic) Dual Dynamic Programming
+
+### Motivating SDDP
+
+Used to solve 
+
+- **multistage** _[a sequence of decisions over time]_,
+- **stochastic** _[potentially existing uncertainty that is gradually revealed over time]_
+
+optimization problems. More or less formal relations can be seen to
+
+- dynamic programming
+- Kelley's cutting plane algorithm
+- Benders decomposition
+- reinforcement (Q) learning
+- backpropagation
+
+::: {.callout-tip}
+Dowson, O. and Kapelevich, L. (2021) -- [doi: 10.1287/ijoc.2020.0987](https://doi.org/10.1287/ijoc.2020.0987)
+:::
+
+### Motivating SDDP
+
+:::: {.columns}
+
+::: {.column width="38%"}
+#### **Going from a single node ...**
+![](img/node.png){height=30%}
+:::
+
+::: {.column width="55%"}
+#### **... to policy graphs with transition probabilities**
+![](img/policy_graph.png){height=30%}
+:::
+
+::::
+
+::: {.callout-tip}
+#### ... or even infinite horizons!
+Dowson, O. (2020) -- [doi: 10.1002/net.21932](https://doi.org/10.1002/net.21932)
+:::
+
+### Motivating SDDP
+
+#### **The $i$-th value function $V_i(x, \omega)$**
+$$
+\begin{aligned}
+    V_i(x, \omega) = \min\limits_{\bar{\textbf{x}}, \textbf{x}^\prime, \textbf{u}} \quad & C_i(\bar{\textbf{x}}, \textbf{u}, \omega) + \mathbb{E}_{j \in i^+, \varphi \in \Omega_j}[V_j(\textbf{x}^\prime, \varphi)]\\
+    & \textbf{x}^\prime = T_i(\bar{\textbf{x}}, \textbf{u}, \omega), \quad \textbf{u} \in U_i(\bar{\textbf{x}}, \omega) \\
+    & \bar{\textbf{x}} = x,
+\end{aligned}
+$$
+
+#### **... and it's approximation after $k$ iterations**
+$$
+\begin{aligned}
+    V_i^{(k)}(x, \omega) = \min\limits_{\bar{\textbf{x}}, \textbf{x}^\prime, \textbf{u}} \quad & C_i(\bar{\textbf{x}}, u, \omega) + \theta\\
+    & \textbf{x}^\prime = T_i(\bar{\textbf{x}}, \textbf{u}, \omega), \quad \textbf{u} \in U_i(\bar{\textbf{x}}, \omega) \\
+    & \bar{\textbf{x}} = x \\
+    & \theta \ge \dots
+\end{aligned}
+$$
+
+### Properties
+
+The beauty of SDDP lies in its natural relation to familiar modelling approaches: A path is defined by specific periods that are modelled in detail, with a transition function between them. Periods can, e.g., be full years or shorter periods with sophisticated linking.
+
+#### **Some advantages**
+- approach can be used for deterministic problems
+- alternative risk measures, e.g., CVaR can directly be used
+- allows _hazard-decision_ ("wait-and-see") or _decision-hazard_ ("here-and-now") modes
+
+#### **Some challenges**
+- requires _relatively complete recource_ (c.f. always feasible optimality-cut Benders)
+- cut generation may be subject to instabilities (c.f. single- vs. multi-cut),
+- which puts more emphasize on proper scaling of the model during formulation
+
+# Simplified example
+
+## Single country system from 2030 to 2050
+
+### Overview
+
+![](img/model.drawio.png){height=80% fig-align="center"}
+
+### Results: Course of objective "bounds"
+
+![Due to first-class support for stochastic models, no explicit upper bound (compared to Benders) is tracked. Instead, an estimation is given by a forward-pass simulation. The iterative nature allows early stopping, which may otherwise not be a possibility.](img/performance.png){height=65%}
+
+### Results: Investments
+
+![Investments into generation and storage assets, from 2030 to 2050, comparing a single-shot (SS) and pathway (PW) approach.](img/p_nom.png){height=65%}
+
+### Results: Energy mix
+
+![Contribution of different technologies to the total annual energy mix, from 2030 to 2050, comparing a single-shot (SS) and pathway (PW) approach.](img/gen.png){height=65%}
+
+### Results: System KPIs
+
+![Comparison of high-level results: Load shedding results are almost identical, and only occur in later years (assumption: reduced costs due to the introduction of DSR products). The total annual system cost is slightly higher for PW (expected!), which even leads to a solution that could be considered near-optimal. Overheads in 2050 are caused by no decommissioning assumption in the simplified example.](img/kpis.png){height=55%}
