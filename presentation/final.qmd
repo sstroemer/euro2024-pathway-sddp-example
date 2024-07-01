@@ -323,7 +323,11 @@ The beauty of SDDP lies in its natural relation to familiar modelling approaches
 
 ### Overview
 
-![](img/model.drawio.png){height=80% fig-align="center"}
+![](img/model.drawio.png){height=60% fig-align="center"}
+
+::: {.callout-tip}
+[github: sstroemer/euro2024-pathway-sddp-example](https://github.com/sstroemer/euro2024-pathway-sddp-example)
+:::
 
 ### Results: Course of objective "bounds"
 
